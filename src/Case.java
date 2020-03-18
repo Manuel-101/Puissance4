@@ -1,7 +1,11 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Case {
     private int l;
@@ -12,8 +16,23 @@ public class Case {
     private Timer timer;
     private JPanel panel;
 
-    public static int sc = 40;
-    public static int sl = 40;
+    private static BufferedImage imageYellow;
+    private static BufferedImage imageRed;
+
+
+    static {
+        try {
+            imageYellow = ImageIO.read(new File("res/yellow.png"));
+            imageRed = ImageIO.read(new File("res/red.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public static int sc = 80;
+    public static int sl = 80;
     public Case(int col, int ligne, JPanel p){
         l=ligne;
         c=col;
@@ -21,25 +40,30 @@ public class Case {
     }
 
     public void draw(Graphics g) {
-        if(isFalling){
+        if(!isFalling) {
+            switch (color){
+                case 0:
+                    g.setColor(Color.black);
+                    g.fillOval(c * sc, (5-l) * sl, sc,sl);
+                    break;
+                case 1:
+                    g.drawImage(imageRed,c * sc, (5-l) * sl, sc,sl,null);
+                    break;
+                case 2:
+                    g.drawImage(imageYellow,c * sc, (5-l) * sl, sc,sl,null);
+                    break;
+            }
+        }else{
             g.setColor(Color.black);
             g.fillOval(c * sc, (5-l) * sl, sc,sl);
-        }
-        switch (color){
-            case 0:
-                g.setColor(Color.black);
-                break;
-            case 1:
-                g.setColor(Color.red);
-                break;
-            case 2:
-                g.setColor(Color.yellow);
-                break;
-        }
-        if(!isFalling) {
-            g.fillOval(c * sc, (5-l) * sl, sc,sl);
-        }else{
-            g.fillOval(c * sc, posf, sc, sl);
+            switch (color){
+                case 1:
+                    g.drawImage(imageRed,c * sc, posf, sc,sl,null);
+                    break;
+                case 2:
+                    g.drawImage(imageYellow,c * sc, posf, sc,sl,null);
+                    break;
+            }
         }
     }
 
