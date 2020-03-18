@@ -32,6 +32,7 @@ public class GameWindow extends JFrame  {
     }
 
     public void stopGame(){
+        g.stopGame();
         setContentPane(m);
         setSize(600,400);
     }
