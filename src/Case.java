@@ -68,7 +68,7 @@ public class Case {
     }
 
     public void joue(int c) {
-        color = c;
+        color = c+1;
         isFalling = true;
         posf = -sl;
         timer = new Timer(50,

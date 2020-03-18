@@ -1,9 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-
+//todo mettre egalite lorsque toutes les cases sont remplies, avec un nombre de coups < n*m
 public class Plateau extends JPanel implements MouseListener, ComponentListener {
     Case[][] p = new Case[7][6];
+    JFrame frameFin;
+    JLabel labelFin;
     //1 : rouge 2 : jaune
     int joueur = 1;
     boolean fin = false;
@@ -15,7 +17,12 @@ public class Plateau extends JPanel implements MouseListener, ComponentListener 
         }
         addMouseListener(this);
         addComponentListener(this);
+        setBackground(Color.gray);
         setPreferredSize(new Dimension(Case.sc*7, Case.sl * 6));
+        frameFin = new JFrame();
+        labelFin = new JLabel();
+        frameFin.add(labelFin);
+        frameFin.setTitle("Fin");
     }
 
     public void reset(){
@@ -71,12 +78,18 @@ public class Plateau extends JPanel implements MouseListener, ComponentListener 
         if (j == 6) {
             return 1;
         } else {
-            p[i][j].joue(joueur + 1);
+            p[i][j].joue(joueur);
             joueur = 1 - joueur;
             repaint();
             try {
                 gagne(i, j);
-                System.out.println("fin gagnant : " + (1 - joueur));
+                if(joueur == 0){
+                    labelFin.setText("Gagnant : jaune");
+                }else{
+                    labelFin.setText("Gagnant : rouge");
+                }
+                frameFin.setSize(400,200);
+                frameFin.setVisible(true);
                 return 0;
             } catch (GagneException e) {
                 return 1;
@@ -117,7 +130,7 @@ public class Plateau extends JPanel implements MouseListener, ComponentListener 
                     }
                     if(nba == 4){
                         //todo surligner les pions gagnants
-                        //todo suppremier listener ou boolean fini
+                        //todo suppremier listener ou boolean fin
                         fin = true;
                         return res;
                     }
