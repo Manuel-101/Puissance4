@@ -4,13 +4,13 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 
-public class GameWindow extends JFrame  {
+public class MainWindow extends JFrame  {
 
     private Game g;
     private Menu m;
 
 
-    public GameWindow() {
+    public MainWindow() {
         g = new Game(this);
         m = new Menu(this);
         addWindowListener(new WindowAdapter() {

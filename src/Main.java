@@ -1,5 +1,3 @@
-import java.util.Scanner;
-
 public class Main {
     public static void main(String[] args) {
         /*Plateau p = new Plateau();
@@ -31,7 +29,7 @@ public class Main {
             }
 
         }*/
-        GameWindow g = new GameWindow();
+        MainWindow g = new MainWindow();
 
     }
 }
