@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Stack;
-
+// todo pas de rafraischissement si aucun pion isfalling
 public class Plateau extends JPanel implements  ComponentListener {
     Case[][] p = new Case[7][6];
     //1 : rouge 2 : jaune
@@ -29,10 +29,10 @@ public class Plateau extends JPanel implements  ComponentListener {
         setPreferredSize(new Dimension(Case.sc*nbcolonnes, Case.sl * nblignes));
         nbCoupsMax = nbcolonnes*nblignes;
         lastPlayedCases = new Stack<Case>();
-
     }
 
     public void undo(){
+        // CTRL Z equivalent
         if(!lastPlayedCases.empty()){
             lastPlayedCases.pop().reset();
             nbcoups--;
@@ -50,6 +50,7 @@ public class Plateau extends JPanel implements  ComponentListener {
     }
 
     public void start(){
+        // reset toutes les cases et
         joueur = 1;
         nbcoups = 0;
         fin = false;
@@ -96,7 +97,9 @@ public class Plateau extends JPanel implements  ComponentListener {
 
 
     public int joue(int i){
-        //return 0 if continue 1 si mal joué ou 2 si gagne ou fin
+        // joue et retourne 0 si c'est possible
+        // joue et retourne 2 si c'est possible et la fin (gagné ou plateau plein)
+        // retourne 1 si coup impossible
         if (i >= nbcolonnes) {
             return 1;
         }
@@ -151,6 +154,7 @@ public class Plateau extends JPanel implements  ComponentListener {
 
 
     public Case[] gagne(int i, int j)  throws GagneException{
+        // todo a modifier le return
         boolean gagne = false;
         int couleurj = joueur+1;
         int nba;
@@ -195,10 +199,11 @@ public class Plateau extends JPanel implements  ComponentListener {
     }
 
     public int objectif(int jr){
-        //+1 si 2 alignés et 1 trous
+        //todo tableau d'indice deja pris en compte ( en fait peut etre pas)
+        //+1 si 2 alignés et 1 libre
         //+2 si 3
-        //+10 si 4
-        //-1 de meme pour l'autre couleur
+        //100 si 4
+        //- de meme pour l'autre couleur
         int couleurj = jr +1;
         int nba;
         int k;
@@ -243,7 +248,7 @@ public class Plateau extends JPanel implements  ComponentListener {
 //                                    res += 2;
 //                                    break;
                                 case 4:
-                                    return 10;
+                                    return 100;
                             }
                         }
                     }
@@ -252,26 +257,26 @@ public class Plateau extends JPanel implements  ComponentListener {
         }
 
         //pour les prochains coups de c
-/*        for (int i = 0; i < 7; i ++){
+        for (int i = 0; i < 7; i ++){
             int j = 0;
             while (j < nblignes && p[i][j].isFilled()) {
                 j++;
             }
-            if(j>=0) {
+            if(j<= 6) {
                 for (int x = 0; x < 2; x++) {
                     for (int y = -1; y < 2; y++) {
                         if (x != 0 || y == 1) {
                             nba = 0;
                             k = i + x;
                             l = j + y;
-                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == c && nba < 4) {
+                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == couleurj && nba < 4) {
                                 nba++;
                                 k += x;
                                 l += y;
                             }
                             k = i - x;
                             l = j - y;
-                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == c && nba < 4) {
+                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == couleurj && nba < 4) {
                                 nba++;
                                 k -= x;
                                 l -= y;
@@ -287,7 +292,7 @@ public class Plateau extends JPanel implements  ComponentListener {
                 }
             }
         }
-    */
+
         //pour les coups de c-1
         couleurj = 2-jr;
 
@@ -323,7 +328,7 @@ public class Plateau extends JPanel implements  ComponentListener {
 //                                    res += 2;
 //                                    break;
                                 case 4:
-                                    return -10;
+                                    return -100;
                             }
                         }
                     }
@@ -332,7 +337,7 @@ public class Plateau extends JPanel implements  ComponentListener {
         }
 
         //pour les prochains coups de c
-        /*for (int i = 0; i < 7; i ++){
+        for (int i = 0; i < 7; i ++){
             int j = 0;
             while (j < nblignes && p[i][j].isFilled()) {
                 j++;
@@ -344,14 +349,14 @@ public class Plateau extends JPanel implements  ComponentListener {
                             nba = 0;
                             k = i + x;
                             l = j + y;
-                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == c && nba < 4) {
+                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == couleurj && nba < 4) {
                                 nba++;
                                 k += x;
                                 l += y;
                             }
                             k = i - x;
                             l = j - y;
-                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == c && nba < 4) {
+                            while (k >= 0 && k < 7 && l >= 0 && l < 6 && p[k][l].getColor() == couleurj && nba < 4) {
                                 nba++;
                                 k -= x;
                                 l -= y;
@@ -359,18 +364,21 @@ public class Plateau extends JPanel implements  ComponentListener {
 
                             if (nba ==  2) {
                                 res -= 1;
-                            }else if(nba >= 3) {
+                            }else if(nba == 3) {
                                 res -= 2;
                             }
                         }
                     }
                 }
             }
-        }*/
+        }
     return res;
     }
-    //todo : joue s'execute a la fin de la chute
-
+    //todo : highlith du pion gagnant tombant
+    //todo nombre de piont falling si 0 : dt .interrupt
+    public Case getCase(int col, int ligne){
+        return p[col][ligne];
+    }
 
     public void componentResized(ComponentEvent e) {
         Case.sl = getSize().height/6;

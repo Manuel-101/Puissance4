@@ -1,4 +1,6 @@
 public class MoveTree {
+    // implémentation de l'algo minMax
+    // c'est la racine de l'arbre qui retourne l'indice au lieu de la valeur de minMax
     private Plateau p;
     int joueur;
     private MoveNode[] children;
@@ -22,15 +24,20 @@ public class MoveTree {
 
     public void joue(int i){
         p.joue(i);
-       /* if(children[i].getChildren() == null){
-            children[i].computeNextProf();
+        if(children[i].getChildren() == null){
+            children = new MoveNode[p.getNbcolonnes()];
+            for (int j = 0; j < p.getNbcolonnes(); j++) {
+                children[j] = new MoveNode(this, j, true);
+            }
+        }else{
+            children = children[i].getChildren();
         }
-        children = children[i].getChildren();
-*/
-        children = new MoveNode[p.getNbcolonnes()];
-        for (int j = 0; j < p.getNbcolonnes(); j++) {
-            children[j] = new MoveNode(this, j, true);
-        }
+//        children = children[i].getChildren();
+//*/
+//        children = new MoveNode[p.getNbcolonnes()];
+//        for (int j = 0; j < p.getNbcolonnes(); j++) {
+//            children[j] = new MoveNode(this, j, true);
+//        }
     }
 
     public int getCoupOpti(){

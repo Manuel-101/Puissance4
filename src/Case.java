@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class Case {
+public class Case   {
     private int l;
     private int c;
     private int color = 0;    //1 : rouge 2 : jaune
@@ -15,6 +15,8 @@ public class Case {
     private int posf;
     private Plateau p;
     private boolean isWinner;
+    private int v = 0;
+    private static int acc = 2;
 
     private static BufferedImage imageYellow;
     private static BufferedImage imageRed;
@@ -69,18 +71,62 @@ public class Case {
             g.fillOval(c * sc, (5-l) * sl, sc,sl);
             switch (color){
                 case 1:
-                    g.drawImage(imageRed,c * sc, posf, sc,sl,null);
+                    if(isWinner){
+                        g.drawImage(imageRedWin,c * sc, posf, sc,sl,null);
+                    }else{
+                        g.drawImage(imageRed,c * sc, posf, sc,sl,null);
+                    }
                     break;
                 case 2:
-                    g.drawImage(imageYellow,c * sc, posf, sc,sl,null);
+                    if(isWinner){
+                        g.drawImage(imageYellowWin,c * sc, posf, sc,sl,null);
+                    }else{
+                        g.drawImage(imageYellow,c * sc, posf, sc,sl,null);
+                    }
                     break;
             }
-            posf += sl/5;
-            if(posf > (5-l) * sl ) {
-                isFalling = false;
+            //posf += sl/5;
+            //System.out.println(v);
+
+            posf += v;
+            v += acc;
+
+            //getpos de la case en dessous
+            int posdessous =5*sl;
+            if(l > 0){
+                posdessous = p.getCase(c,l-1).getPosVerticaleDudessus();
+            }
+
+
+//            if(posf > (5-l) * sl ) {
+//                posf = (5-l) * sl;
+            if(posf > posdessous ) {
+                posf = posdessous;
+                if(v > 0){
+                    if(v > 10){
+                        v = (int) (-v * 0.4);
+                    }else{
+                        if( posf < 6 + (5-l) * sl && posf > -6 + (5-l) * sl)
+                        isFalling = false;
+                        v = 0;
+                    }
+                }
+
+                //isFalling = false;
             }
         }
     }
+
+
+//todo bug quand on spamme
+    public int getPosVerticaleDudessus() {
+        if(isFalling){
+            return posf - sl;
+        }else{
+            return (4-l) * sl;
+        }
+
+    };
 
     public void reset(){
         isWinner = false;
@@ -95,6 +141,12 @@ public class Case {
         color = c+1;
         isFalling = true;
         posf = -sl;
+
+
+        v = 0;
+
+
+
 //        timer = new Timer(50,
 //                new ActionListener() {
 //                    public void actionPerformed(ActionEvent ev){

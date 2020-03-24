@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class Game extends JPanel implements MouseListener, Runnable {//todo mettre dans un thread
+public class Game extends JPanel implements MouseListener {//todo mettre dans un thread
     private Plateau p;
     private MainWindow gm;
     private boolean ia = false;
@@ -24,30 +24,7 @@ public class Game extends JPanel implements MouseListener, Runnable {//todo mett
 
     }
 
-    public void run(){
-//        while (true){
-//            synchronized (this) {
-//                try {
-//                    this.wait();
-//                } catch (InterruptedException e) {
-//                }
-//            }
-//            //on joue
-//
-//                    iat.joue();
-//                    try {
-//                        Thread.sleep(3000);
-//                        iat.interrupt();
-//                        System.out.println("enterrupion");;
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//
-//            }
-//        }
 
-    }
 
     public void startGame(int i){
         p.start();
@@ -67,7 +44,9 @@ public class Game extends JPanel implements MouseListener, Runnable {//todo mett
     }
 
     public void iajoue(){
-       notify();
+        synchronized (this){
+            notify();
+        }
     }
 
 
@@ -81,14 +60,13 @@ public class Game extends JPanel implements MouseListener, Runnable {//todo mett
             tourJoeur = !ia || !tourJoeur;
             if(!tourJoeur){
                 iat.joue();
-                try {
-                    Thread.sleep(3000);
-                    iat.interrupt();
-                    System.out.println("enterrupion");;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+//                try {
+//                    Thread.sleep(3000);
+//                    iat.interrupt();
+//                    System.out.println("enterrupion");;
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
         //iajoue()

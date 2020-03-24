@@ -1,7 +1,7 @@
 public class MoveNode {
     private MoveNode[] children;
     private int value = 0;
-    private int ind;
+    private int ind; //todo a suppr
     private boolean possible = true;
     private MoveTree mt;
     private boolean opponent;
@@ -40,6 +40,7 @@ public class MoveNode {
 
             return value;
         }else{
+            //todo tester si c'est la fin
             int res = children[0].MinMax();
             int v;
             if(opponent){

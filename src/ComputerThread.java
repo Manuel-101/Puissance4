@@ -1,16 +1,18 @@
 import javax.swing.*;
 import java.util.Random;
-
+//todo si plusieurs coup opti ont la meme valeur alors random entre les coups de valeurs 0;
 public class ComputerThread extends Thread {
     private Game g;
     private Random gen;
     private MoveTree mt;
     Object m;
+    private Thread limit;
+    TimeLimit tl;
     public ComputerThread(Game game, int joueur){
         g = game;
         mt = new MoveTree(joueur);
         gen = new Random();
-
+        tl = new TimeLimit(this);
     }
 
 
@@ -22,7 +24,7 @@ public class ComputerThread extends Thread {
                 } catch (InterruptedException e) {
                 }
             }
-
+            tl.begin();
             //sleep(300);
      /*       while(true){
 
