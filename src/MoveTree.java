@@ -8,8 +8,8 @@ public class MoveTree {
     MoveTree(int joueur){
         this.p = new Plateau(null);
         this.joueur = joueur;
-        children = new MoveNode[p.getNbcolonnes()];
-        for (int j = 0; j < p.getNbcolonnes(); j++) {
+        children = new MoveNode[p.getNbCols()];
+        for (int j = 0; j < p.getNbCols(); j++) {
             children[j] = new MoveNode(this, j, true);
         }
     }
@@ -25,8 +25,8 @@ public class MoveTree {
     public void joue(int i){
         p.joue(i);
         if(children[i].getChildren() == null){
-            children = new MoveNode[p.getNbcolonnes()];
-            for (int j = 0; j < p.getNbcolonnes(); j++) {
+            children = new MoveNode[p.getNbCols()];
+            for (int j = 0; j < p.getNbCols(); j++) {
                 children[j] = new MoveNode(this, j, true);
             }
         }else{
@@ -47,7 +47,7 @@ public class MoveTree {
         int res = Integer.MIN_VALUE;
         int v;
         int ind = 0;
-        for (int j =0; j < p.getNbcolonnes(); j++){
+        for (int j = 0; j < p.getNbCols(); j++){
             if(children[j].isPossible()){
                 v = children[j].MinMax();
                 if(v > res){
@@ -64,13 +64,13 @@ public class MoveTree {
         //calcules le valeurs d'objectifs pour chaque fils
         if (children == null) {
             //creer des fils et donner un valeur
-            children = new MoveNode[p.getNbcolonnes()];
-            for (int j = 0; j < p.getNbcolonnes(); j++) {
+            children = new MoveNode[p.getNbCols()];
+            for (int j = 0; j < p.getNbCols(); j++) {
                 children[j] = new MoveNode(this, j, true);
             }
         }else{
             //calcules le valeurs d'objectifs pour chaque fils
-            for (int j = 0; j < p.getNbcolonnes(); j++) {
+            for (int j = 0; j < p.getNbCols(); j++) {
                 children[j].computeNextProf();
             }
         }

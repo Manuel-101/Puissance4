@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -78,8 +76,8 @@ public class Game extends JPanel implements MouseListener {//todo mettre dans un
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
         int x = mouseEvent.getX();
-        if(tourJoeur && !p.isFin()){
-            joue(x/Case.sc);
+        if(tourJoeur && !p.isOver()){
+            joue(x/Case.getColSize());
         }
         System.out.println("objectif : " + p.objectif(0));
 

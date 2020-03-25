@@ -44,14 +44,14 @@ public class MoveNode {
             int res = children[0].MinMax();
             int v;
             if(opponent){
-                for (int j =1; j < mt.getPlateau().getNbcolonnes(); j++){
+                for (int j = 1; j < mt.getPlateau().getNbCols(); j++){
                     v = children[j].MinMax();
                     if(v < res){
                         res = v;
                     }
                 }
             }else{
-                for (int j =1; j < mt.getPlateau().getNbcolonnes(); j++){
+                for (int j = 1; j < mt.getPlateau().getNbCols(); j++){
                     v = children[j].MinMax();
                     if(v > res){
                         res = v;
@@ -74,13 +74,13 @@ public class MoveNode {
           //  System.out.println("computing");
             if (children == null) {
                 //creer des fils et donner un valeur
-                children = new MoveNode[mt.getPlateau().getNbcolonnes()];
-                for (int j = 0; j < mt.getPlateau().getNbcolonnes(); j++) {
+                children = new MoveNode[mt.getPlateau().getNbCols()];
+                for (int j = 0; j < mt.getPlateau().getNbCols(); j++) {
                     children[j] = new MoveNode(mt, j, !opponent);
                 }
             }else{
                 //calcules le valeurs d'objectifs pour chaque fils
-                for (int j = 0; j < mt.getPlateau().getNbcolonnes(); j++) {
+                for (int j = 0; j < mt.getPlateau().getNbCols(); j++) {
                     children[j].computeNextProf();
                 }
             }

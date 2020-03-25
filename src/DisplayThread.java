@@ -5,17 +5,14 @@ public class DisplayThread extends Thread {
     public DisplayThread(JPanel jp){
         p = jp;
     }
-
-
-
+    //todo à optimiser
     public void run(){
-        try {
-            while (true) {
+        while (true) {
+            try {
                 p.repaint();
                 sleep(30);
+            } catch (InterruptedException e) {
             }
-        } catch (InterruptedException e) {
-
         }
     }
 

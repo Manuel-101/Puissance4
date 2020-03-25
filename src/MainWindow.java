@@ -20,7 +20,7 @@ public class MainWindow extends JFrame  {
             }
         });
         setTitle("Puissance 4");
-        setSize(600,400);
+        setSize(500,400);
         this.setContentPane(m);
         setVisible(true);
     }
@@ -29,12 +29,13 @@ public class MainWindow extends JFrame  {
         this.setContentPane(g);
         g.startGame(i);
         setSize(getPreferredSize());
+        System.out.println(getPreferredSize());
     }
 
     public void stopGame(){
         g.stopGame();
         setContentPane(m);
-        setSize(600,400);
+        setSize(500,400);
     }
 
 }

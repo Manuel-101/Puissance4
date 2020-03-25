@@ -1,151 +1,168 @@
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 public class Case   {
-    private int l;
+    private int r;
     private int c;
-    private int color = 0;    //1 : rouge 2 : jaune
-    private boolean isFalling = false;
-    private int posf;
+    private int color = -1;    // -1 : vide, 0 : rouge,  1 : jaune
     private Plateau p;
-    private boolean isWinner;
-    private int v = 0;
-    private static int acc = 2;
+    private boolean winner = false;
+    private boolean falling = false;
+    private int verticalPos;
+    private int speed = 0;
+
+    private static int acceleration = 2;
+    private static int colSize = 80;
+    private static int rowSize = 80;
 
     private static BufferedImage imageYellow;
     private static BufferedImage imageRed;
     private static BufferedImage imageYellowWin;
     private static BufferedImage imageRedWin;
-
+    private static BufferedImage imageFront;
     static {
         try {
             imageYellow = ImageIO.read(new File("res/yellow.png"));
             imageRed = ImageIO.read(new File("res/red.png"));
             imageYellowWin = ImageIO.read(new File("res/yellow_win.png"));
             imageRedWin = ImageIO.read(new File("res/red_win.png"));
+            imageFront = ImageIO.read(new File("res/front.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
-
-    public static int sc = 80;
-    public static int sl = 80;
-    public Case(int col, int ligne, Plateau pl){
-        l=ligne;
+    public Case(int col, int row, Plateau pl){
+        r=row;
         c=col;
         p = pl;
     }
 
+    public boolean isFilled(){
+        return color >= 0;
+    }
+
+    public  int getColor(){
+        return color;
+    }
+
+    public static void setColSize(int colSize) {
+        Case.colSize = colSize;
+    }
+
+    public static void setRowSize(int rowSize) {
+        Case.rowSize = rowSize;
+    }
+
+    public static int getColSize() {
+        return colSize;
+    }
+
+    public static int getRowSize() {
+        return rowSize;
+    }
+
     public void draw(Graphics g) {
-        if(!isFalling) {
+        if(!falling) {//todo a simplifier, use vertical pos meme si pas falling
             switch (color){
-                case 0:
+                case -1: // todo lag si on l'enlève
                     g.setColor(Color.black);
-                    g.fillOval(c * sc, (5-l) * sl, sc,sl);
+                    g.fillOval(c * colSize, (5- r) * rowSize, colSize /2, rowSize /2);
                     break;
-                case 1:
-                    if(isWinner){
-                        g.drawImage(imageRedWin,c * sc, (5-l) * sl, sc,sl,null);
+                case 0:
+                    if(winner){
+                        g.drawImage(imageRedWin,c * colSize, (5- r) * rowSize, colSize, rowSize,null);
                     }else{
-                        g.drawImage(imageRed,c * sc, (5-l) * sl, sc,sl,null);
+                        g.drawImage(imageRed,c * colSize, (5- r) * rowSize, colSize, rowSize,null);
                     }
                     break;
-                case 2:
-                    if(isWinner){
-                        g.drawImage(imageYellowWin,c * sc, (5-l) * sl, sc,sl,null);
+                case 1:
+                    if(winner){
+                        g.drawImage(imageYellowWin,c * colSize, (5- r) * rowSize, colSize, rowSize,null);
                     }else{
-                        g.drawImage(imageYellow,c * sc, (5-l) * sl, sc,sl,null);
+                        g.drawImage(imageYellow,c * colSize, (5- r) * rowSize, colSize, rowSize,null);
                     }
                     break;
             }
         }else{
-            g.setColor(Color.black);
-            g.fillOval(c * sc, (5-l) * sl, sc,sl);
             switch (color){
+                case 0:
+                    if(winner){
+                        g.drawImage(imageRedWin,c * colSize, verticalPos, colSize, rowSize,null);
+                    }else{
+                        g.drawImage(imageRed,c * colSize, verticalPos, colSize, rowSize,null);
+                    }
+                    break;
                 case 1:
-                    if(isWinner){
-                        g.drawImage(imageRedWin,c * sc, posf, sc,sl,null);
+                    if(winner){
+                        g.drawImage(imageYellowWin,c * colSize, verticalPos, colSize, rowSize,null);
                     }else{
-                        g.drawImage(imageRed,c * sc, posf, sc,sl,null);
-                    }
-                    break;
-                case 2:
-                    if(isWinner){
-                        g.drawImage(imageYellowWin,c * sc, posf, sc,sl,null);
-                    }else{
-                        g.drawImage(imageYellow,c * sc, posf, sc,sl,null);
+                        g.drawImage(imageYellow,c * colSize, verticalPos, colSize, rowSize,null);
                     }
                     break;
             }
-            //posf += sl/5;
-            //System.out.println(v);
 
-            posf += v;
-            v += acc;
+            verticalPos += speed;
+            speed += acceleration;
 
-            //getpos de la case en dessous
-            int posdessous =5*sl;
-            if(l > 0){
-                posdessous = p.getCase(c,l-1).getPosVerticaleDudessus();
+            //position de la case en dessous pour eventuellement rebondir dessus
+            int posUnder;
+            if(r > 0){ // il y a une case en dessous
+                posUnder = p.getCase(c, r -1).getVerticalPos()-rowSize;
+            }else{
+                posUnder = (p.getNbRows()-1)* rowSize;
             }
 
-
-//            if(posf > (5-l) * sl ) {
-//                posf = (5-l) * sl;
-            if(posf > posdessous ) {
-                posf = posdessous;
-                if(v > 0){
-                    if(v > 10){
-                        v = (int) (-v * 0.4);
+            if(verticalPos > posUnder ) {
+                verticalPos = posUnder;
+                if(speed > 0){
+                    if(speed > 10){ // rebond
+                        speed = -speed/3;
                     }else{
-                        if( posf < 6 + (5-l) * sl && posf > -6 + (5-l) * sl)
-                        isFalling = false;
-                        v = 0;
+                        // si il n'a pas beaucoup de vitesse et il est proche de sa position finale
+                        // on arrete de le faire rebondir
+                        if( verticalPos > (p.getNbRows()-1- r) * rowSize - 5 && verticalPos < (p.getNbRows()-1- r) * rowSize + 5){
+                            falling = false;
+                            speed = 0;
+                        }
                     }
                 }
-
-                //isFalling = false;
             }
         }
+        g.drawImage(imageFront,c * colSize, (5- r) * rowSize, colSize, rowSize,null);
     }
 
 
 //todo bug quand on spamme
-    public int getPosVerticaleDudessus() {
-        if(isFalling){
-            return posf - sl;
+    public int getVerticalPos() { //retourne la position du haut du pion, utilisé pour les collisions
+        if(falling){
+            return verticalPos;
         }else{
-            return (4-l) * sl;
+            return (p.getNbRows()-1-r) * rowSize;
         }
-
     };
 
     public void reset(){
-        isWinner = false;
-        color = 0;
+        winner = false;
+        falling = false;
+        color = -1;
     }
 
     public void setWinner(boolean w){
-        isWinner = w;
+        winner = w;
     }
 
     public void joue(int c) {
-        color = c+1;
-        isFalling = true;
-        posf = -sl;
+        color = c;
+        falling = true;
+        verticalPos = -rowSize;
+        speed = 0;
 
 
-        v = 0;
-
-
+    //todo nbfalling pion
 
 //        timer = new Timer(50,
 //                new ActionListener() {
@@ -161,12 +178,4 @@ public class Case   {
 //        timer.start();
     }
 
-
-
-    public boolean isFilled(){
-        return color > 0;
-    }
-    public  int getColor(){
-        return color;
-    }
 }
