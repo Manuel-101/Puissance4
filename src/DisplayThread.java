@@ -7,12 +7,12 @@ public class DisplayThread extends Thread {
     }
     //todo à optimiser
     public void run(){
-        while (true) {
-            try {
+        try {
+            while (true) {
                 p.repaint();
                 sleep(30);
-            } catch (InterruptedException e) {
             }
+        } catch (InterruptedException e) {
         }
     }
 

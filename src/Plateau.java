@@ -205,32 +205,39 @@ public class Plateau extends JPanel implements  ComponentListener {
 
         int x;
         int y;
+        int mult = 0;
+        int couleur = 0;
 
 
 
-
-        //pour les coup de c
-
+        //pour les coup de c et c-1
         for (int i = 0; i < 7; i ++){
             int j = 5;
             while (j >= 0 && !grid[i][j].isFilled()) {
                 j--;
             }
             if(j>=0 && grid[i][j].getColor() == couleurj) {
-                for(int ii = 0; ii < 4; ii ++){
+                mult = 1;
+                couleur = couleurj;
+            }else if(j>=0){
+                mult = -1;
+                couleur = 1-couleurj;
+            }
+            if(j>=0) {
+                for (int ii = 0; ii < 4; ii++) {
                     x = dirx[ii];
                     y = diry[ii];
                     nba = 1;
                     k = i + x;
                     l = j + y;
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
+                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
                         nba++;
                         k += x;
                         l += y;
                     }
                     k = i - x;
                     l = j - y;
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
+                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
                         nba++;
                         k -= x;
                         l -= y;
@@ -243,11 +250,13 @@ public class Plateau extends JPanel implements  ComponentListener {
 //                                    res += 2;
 //                                    break;
                         case 4:
-                            return 100;
+                            return mult * 1000;
                     }
                 }
             }
+
         }
+
 
         //pour les prochains coups de c
         for (int i = 0; i < 7; i ++){
@@ -255,130 +264,99 @@ public class Plateau extends JPanel implements  ComponentListener {
             while (j < nbRows && grid[i][j].isFilled()) {
                 j++;
             }
-            if(j<= 6) {
-                for(int ii = 0; ii < 4; ii ++){
-                    x = dirx[ii];
-                    y = diry[ii];
-                    nba = 0;
-                    nbl = 0;
-                    k = i + x;
-                    l = j + y;
-                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
-                        nbl++;
+            for(int jk =0;jk+j < nbRows; jk++){
+                for(int jj =0; jj < 2; jj++) {
+                    if(jj ==0){
+                        couleur = couleurj;
+                        mult = 1;
+                    }else{
+                        couleur = 1-couleurj;
+                        mult = -1;
                     }
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-                        nba++;
-                        k += x;
-                        l += y;
-                    }
-                    k = i - x;
-                    l = j - y;
-                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
-                        nbl++;
-                    }
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-                        nba++;
-                        k -= x;
-                        l -= y;
-                    }
+                    for (int ii = 0; ii < 4; ii++) {
+                        x = dirx[ii];
+                        y = diry[ii];
+                        nba = 0;
+                        nbl = 0;
+                        k = i + x;
+                        l = jk+j + y;
+                        //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
+                        if (k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
+                            nbl++;
+                        }
+                        while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
+                            nba++;
+                            k += x;
+                            l += y;
+                        }
+                        k = i - x;
+                        l = jk+j - y;
+                        //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
+                        if (k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
+                            nbl++;
+                        }
+                        while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
+                            nba++;
+                            k -= x;
+                            l -= y;
+                        }
 
-                    if (nba ==  2 && nbl > 0) {
-                        res += 1;
-                    }else if(nba >= 3) {
-                        res += 10;
+                        if (nba == 2 && nbl > 0) {
+                            res += mult*(nbRows+1-jk);
+                        } else if (nba >= 3) {
+                            res += mult*(nbRows+1-jk)*10;
+                        }
                     }
                 }
-
 
             }
         }
 
-        //pour les coups de c-1
-        couleurj = 1-jr;
 
-        for (int i = 0; i < 7; i ++){
-            int j = 5;
-            while (j >= 0 && !grid[i][j].isFilled()) {
-                j--;
-            }
-            if(j>=0 && grid[i][j].getColor() == couleurj) {
-                for(int ii = 0; ii < 4; ii ++){
-                    x = dirx[ii];
-                    y = diry[ii];
-                    nba = 1;
-                    k = i + x;
-                    l = j + y;
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-                        nba++;
-                        k += x;
-                        l += y;
-                    }
-                    k = i - x;
-                    l = j - y;
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-                        nba++;
-                        k -= x;
-                        l -= y;
-                    }
-                    switch (nba) {
-//                                case 2:
-//                                    res += 1;
-//                                    break;
-//                                case 3:
-//                                    res += 2;
-//                                    break;
-                        case 4:
-                            return -100;
-                    }
-                }
-            }
-        }
 
-        //pour les prochains coups de c-1
-        for (int i = 0; i < 7; i ++){
-            int j = 0;
-            while (j < nbRows && grid[i][j].isFilled()) {
-                j++;
-            }
-            if(j>=0) {
-                for(int ii = 0; ii < 4; ii ++){
-                    x = dirx[ii];
-                    y = diry[ii];
-                    nba = 0;
-                    nbl = 0;
-                    k = i + x;
-                    l = j + y;
-                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
-                        nbl++;
-                    }
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-                        nba++;
-                        k += x;
-                        l += y;
-                    }
-                    k = i - x;
-                    l = j - y;
-                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
-                        nbl++;
-                    }
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-                        nba++;
-                        k -= x;
-                        l -= y;
-                    }
-
-                    if (nba ==  2 && nbl > 0) {
-                        res -= 1;
-                    }else if(nba == 3) {
-                        res -= 10;
-                    }
-                }
-            }
-        }
+//        //pour les prochains coups de c-1
+//        for (int i = 0; i < 7; i ++){
+//            int j = 0;
+//            while (j < nbRows && grid[i][j].isFilled()) {
+//                j++;
+//            }
+//            if(j>=0) {
+//                for(int ii = 0; ii < 4; ii ++){
+//                    x = dirx[ii];
+//                    y = diry[ii];
+//                    nba = 0;
+//                    nbl = 0;
+//                    k = i + x;
+//                    l = j + y;
+//                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
+//                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
+//                        nbl++;
+//                    }
+//                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
+//                        nba++;
+//                        k += x;
+//                        l += y;
+//                    }
+//                    k = i - x;
+//                    l = j - y;
+//                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
+//                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
+//                        nbl++;
+//                    }
+//                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
+//                        nba++;
+//                        k -= x;
+//                        l -= y;
+//                    }
+//
+//                    if (nba ==  2 && nbl > 0) {
+//                        res -= 1;
+//                    }else if(nba == 3) {
+//                        res -= 10;
+//                    }
+//                }
+//            }
+//        }
     return res;
     }
 
