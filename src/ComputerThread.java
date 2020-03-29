@@ -5,20 +5,23 @@ public class ComputerThread extends Thread {
     private Random gen;
     private MoveTree mt;
     TimeLimit timelimit;
+    private int optimalMove = 0;
     public ComputerThread(Game game, int joueur){
         g = game;
-        mt = new MoveTree(joueur);
+        mt = new MoveTree(this,joueur);
         gen = new Random();
         timelimit = new TimeLimit(this);
     }
-
+    //todo bug quand tu quitter
 
     public void run(){
+        int nbprof = 0;
         while (true){
             synchronized (this) {
                 try {
-                    this.wait();
+                    wait();
                 } catch (InterruptedException e) {
+                    System.out.println("ljlkj");
                 }
             }
             timelimit.begin();
@@ -36,9 +39,17 @@ public class ComputerThread extends Thread {
 
 
            //try {
+            nbprof = 0;
+
                 while (!interrupted()) {
-                    mt.computeNextProf();
-                    System.out.println("prof +1");
+                    try{
+                        optimalMove = mt.MinMaxNextProf();
+                        System.out.println("prof +1");
+                        nbprof++;
+
+                    }catch (TimeLimitException e){
+
+                    }
 
                     //sleep(50);
 
@@ -47,10 +58,10 @@ public class ComputerThread extends Thread {
             //} catch (InterruptedException e) {
               //  System.out.println("interrupted");
             //}*/
-
+            System.out.println("NBPROF : "+nbprof);
             mt.getPlateau().imprime();
             System.out.println("plat ^");
-            g.joue(mt.getCoupOpti());
+            g.joue(optimalMove);
             System.out.println("FINIAJOUE ========================");
 
 

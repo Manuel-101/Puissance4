@@ -8,8 +8,9 @@ public class Game extends JPanel implements MouseListener {//todo mettre dans un
     private MainWindow gm;
     private boolean ia = false;
     private boolean tourJoeur = false;
-    private ComputerThread iat;
     private Timer t;
+    private ComputerThread iat;
+
 
     public Game(MainWindow g){
         this.setLayout(new BorderLayout());
@@ -29,10 +30,8 @@ public class Game extends JPanel implements MouseListener {//todo mettre dans un
         tourJoeur = true;
         if(i ==1){
             ia = true;
-            iat = new ComputerThread(this, 0);
+            iat = new ComputerThread(this, 0); //todo joueur 0 = jaune
             iat.start();
-        }else{
-            ia = false;
         }
 
     }
@@ -41,20 +40,19 @@ public class Game extends JPanel implements MouseListener {//todo mettre dans un
         p.stop();
     }
 
-    public void iajoue(){
-        synchronized (this){
-            notify();
-        }
-    }
+
 
 
     //todo : click : p.joue; next;
 
     public void joue(int i){
+
+
         if(p.joue(i) == 0){
             if(ia){
                 iat.updateTree(i);
             }
+
             tourJoeur = !ia || !tourJoeur;
             if(!tourJoeur){
                 iat.joue();
@@ -80,7 +78,6 @@ public class Game extends JPanel implements MouseListener {//todo mettre dans un
             joue(x/Case.getColSize());
         }
         System.out.println("objectif : " + p.objectif(0));
-
     }
 
 

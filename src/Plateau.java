@@ -34,6 +34,18 @@ public class Plateau extends JPanel implements  ComponentListener {
         undoStack = new Stack<Case>();
     }
 
+    public Plateau(Plateau that){
+        grid = new Case[7][6];
+        for (int i = 0; i < 7; i++){
+            for(int j = 0; j < 6; j++) {
+                grid[i][j] = new Case(i,j,this);
+                grid[i][j].joue(that.getCase(i,j).getColor());
+            }
+        }
+        maxNbMoves = nbCols * nbRows;
+        undoStack = new Stack<Case>();
+    }
+
     public int getNbCols(){
         return nbCols;
     }
@@ -250,7 +262,7 @@ public class Plateau extends JPanel implements  ComponentListener {
 //                                    res += 2;
 //                                    break;
                         case 4:
-                            return mult * 1000;
+                            return mult * 100000;
                     }
                 }
             }

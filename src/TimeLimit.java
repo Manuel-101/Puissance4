@@ -12,7 +12,7 @@ public class TimeLimit extends Thread{
             synchronized (this) {
                 try {
                     wait();
-                    sleep(3000);
+                    sleep(5000);
                     ct.interrupt();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
