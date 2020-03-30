@@ -18,18 +18,24 @@ public class Case   {
     private static int colSize = 80;
     private static int rowSize = 80;
 
-    private static BufferedImage imageYellow;
-    private static BufferedImage imageRed;
+    public static BufferedImage imageYellow;
+    public static BufferedImage imageRed;
     private static BufferedImage imageYellowWin;
     private static BufferedImage imageRedWin;
     private static BufferedImage imageFront;
+
     static {
         try {
-            imageYellow = ImageIO.read(new File("res/yellow.png"));
-            imageRed = ImageIO.read(new File("res/red.png"));
-            imageYellowWin = ImageIO.read(new File("res/yellow_win.png"));
-            imageRedWin = ImageIO.read(new File("res/red_win.png"));
-            imageFront = ImageIO.read(new File("res/front.png"));
+//            imageYellow = ImageIO.read(Case.class.getResourceAsStream("yellow.png"));
+//            imageRed = ImageIO.read(Case.class.getResourceAsStream("red.png"));
+//            imageYellowWin = ImageIO.read(Case.class.getResourceAsStream("yellow_win.png"));
+//            imageRedWin = ImageIO.read(Case.class.getResourceAsStream("red_win.png"));
+//            imageFront = ImageIO.read(Case.class.getResourceAsStream("front.png"));
+            imageYellow = ImageIO.read(new File("resources/yellow.png"));
+            imageRed = ImageIO.read(new File("resources/red.png"));
+            imageYellowWin = ImageIO.read(new File("resources/yellow_win.png"));
+            imageRedWin = ImageIO.read(new File("resources/red_win.png"));
+            imageFront = ImageIO.read(new File("resources/front.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,11 +72,11 @@ public class Case   {
     }
 
     public void draw(Graphics g) {
-        if(!falling) {//todo a simplifier, use vertical pos meme si pas falling
+        if(!falling) {
             switch (color){
-                case -1: // todo lag si on l'enlève
+                case -1: // sert à rien mais lag si enlevé
                     g.setColor(Color.black);
-                    g.fillOval(c * colSize, (5- r) * rowSize, colSize /2, rowSize /2);
+                    g.fillOval(c * colSize, (5- r) * rowSize, colSize/10, rowSize/10);
                     break;
                 case 0:
                     if(winner){
@@ -122,7 +128,7 @@ public class Case   {
                     if(speed > 10){ // rebond
                         speed = -speed/3;
                     }else{
-                        // si il n'a pas beaucoup de vitesse et il est proche de sa position finale
+                        // si pas beaucoup de vitesse et proche de sa position finale
                         // on arrete de le faire rebondir
                         if( verticalPos > (p.getNbRows()-1- r) * rowSize - 5 && verticalPos < (p.getNbRows()-1- r) * rowSize + 5){
                             falling = false;
@@ -136,7 +142,6 @@ public class Case   {
     }
 
 
-//todo bug quand on spamme
     public int getVerticalPos() { //retourne la position du haut du pion, utilisé pour les collisions
         if(falling){
             return verticalPos;
@@ -160,22 +165,6 @@ public class Case   {
         falling = true;
         verticalPos = -rowSize;
         speed = 0;
-
-
-    //todo nbfalling pion
-
-//        timer = new Timer(50,
-//                new ActionListener() {
-//                    public void actionPerformed(ActionEvent ev){
-//                        posf += sl/4;
-//                        if(posf > (5-l) * sl ) {
-//                            isFalling = false;
-//                            timer.stop();
-//                        }
-//                        panel.repaint();
-//                    }
-//                });
-//        timer.start();
     }
 
 }

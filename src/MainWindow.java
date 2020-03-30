@@ -1,18 +1,13 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.*;
 
 public class MainWindow extends JFrame  {
-
-    private Game g;
-    private Menu m;
-
+    private Game game;
+    private Menu menu;
 
     public MainWindow() {
-        g = new Game(this);
-        m = new Menu(this);
+        game = new Game(this);
+        menu = new Menu(this);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -21,21 +16,18 @@ public class MainWindow extends JFrame  {
         });
         setTitle("Puissance 4");
         setSize(500,400);
-        this.setContentPane(m);
+        this.setContentPane(menu);
         setVisible(true);
     }
 
     public void startGame(int i){
-        this.setContentPane(g);
-        g.startGame(i);
+        this.setContentPane(game);
+        game.startGame(i);
         setSize(getPreferredSize());
-        System.out.println(getPreferredSize());
     }
 
     public void stopGame(){
-        g.stopGame();
-        setContentPane(m);
+        setContentPane(menu);
         setSize(500,400);
     }
-
 }

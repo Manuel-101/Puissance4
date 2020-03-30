@@ -2,33 +2,25 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Menu extends JPanel {
-    JButton jcj;
-    JButton jcm;
+    JButton pvp;
+    JButton pvm;
     JButton quit;
-    JButton mcm;
-    MainWindow gm;
-    public Menu(MainWindow g){
-        //setSize(566,532);
-        gm = g;
+    MainWindow window;
+
+    public Menu(MainWindow w){
+        window = w;
         JPanel jp = new JPanel();
-        GridLayout layout = new GridLayout(4,1);
+        GridLayout layout = new GridLayout(3,1);
         layout.setHgap(10);
         layout.setVgap(10);
         jp.setLayout(layout);
         setLayout(new GridBagLayout());
-        //jp.setSize(200,300);
-        jcj = new JButton("joueur contre jouer");
-        jcj.addActionListener(actionEvent -> gm.startGame(0));
-        //jcj.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jp.add(jcj);
-        jcm = new JButton("joueur contre machine");
-        jcm.addActionListener(actionEvent -> gm.startGame(1));
-        //jcm.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jp.add(jcm);
-        mcm = new JButton("machine contre machine");
-        mcm.addActionListener(actionEvent -> gm.startGame(2));
-        //jcm.setAlignmentX(Component.CENTER_ALIGNMENT);
-        jp.add(mcm);
+        pvp = new JButton("joueur contre jouer");
+        pvp.addActionListener(actionEvent -> window.startGame(0));
+        jp.add(pvp);
+        pvm = new JButton("joueur contre machine");
+        pvm.addActionListener(actionEvent -> window.startGame(1));
+        jp.add(pvm);
         quit = new JButton("quitter");
         quit.addActionListener(actionEvent -> System.exit(0));
         setAlignmentY(SwingConstants.CENTER);

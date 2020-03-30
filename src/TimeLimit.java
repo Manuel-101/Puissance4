@@ -8,16 +8,15 @@ public class TimeLimit extends Thread{
     }
 
     public void run(){
-        while (true){
-            synchronized (this) {
-                try {
-                    wait();
-                    sleep(5000);
-                    ct.interrupt();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        try {
+            while (true){
+                synchronized (this) {
+                        wait();
+                        sleep(5000);
+                        ct.interrupt();
                 }
             }
+        } catch (InterruptedException e) {
         }
     }
 

@@ -2,11 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Stack;
-// todo pas de rafraischissement si aucun pion isfalling
+
 public class Plateau extends JPanel implements  ComponentListener {
     Case[][] grid;
     private int nbMoves = 0;
-    private int maxNbMoves;
+    private int maxNbMoves = 7 * 6;
     private int player = 1; //0 : rouge 1 : jaune
     private int nbRows = 6;
     private int nbCols = 7;
@@ -28,22 +28,16 @@ public class Plateau extends JPanel implements  ComponentListener {
         }
         addMouseListener(ml);
         addComponentListener(this);
-        setBackground(new Color(20,20,50));
         setPreferredSize(new Dimension(Case.getColSize()* nbCols, Case.getRowSize() * nbRows));
-        maxNbMoves = nbCols * nbRows;
+        setBackground(new Color(0,0,110));
         undoStack = new Stack<Case>();
     }
 
-    public Plateau(Plateau that){
-        grid = new Case[7][6];
-        for (int i = 0; i < 7; i++){
-            for(int j = 0; j < 6; j++) {
-                grid[i][j] = new Case(i,j,this);
-                grid[i][j].joue(that.getCase(i,j).getColor());
-            }
-        }
+    public Plateau(MouseListener ml, int nbCols, int nbRows){
+        this(ml);
+        this.nbCols = nbCols;
+        this.nbRows = nbRows;
         maxNbMoves = nbCols * nbRows;
-        undoStack = new Stack<Case>();
     }
 
     public int getNbCols(){
@@ -127,7 +121,7 @@ public class Plateau extends JPanel implements  ComponentListener {
                 gagne(i, j); //on teste si le joueur a gagné
                 over = true;
                 return 2;
-            } catch (GagneException e) {
+            } catch (WinException e) {
                 player = 1 - player; // change de joueur
                 if(nbMoves == maxNbMoves){ // plateau rempli, égalité
                     over = true;
@@ -159,9 +153,8 @@ public class Plateau extends JPanel implements  ComponentListener {
         }
     }
 
-    public void gagne(int i, int j)  throws GagneException{
-        // met fin = true
-        // met les pions gagnants en surbrillance si le coup en i,j est gagnant, 
+    public void gagne(int i, int j)  throws WinException {
+        // met les pions gagnants en surbrillance et over = true si le coup en i,j est gagnant,
         // throws GagneException si le joueur n'as pas gagné
         int nba; // nombre d'alignés
         int x;
@@ -190,189 +183,138 @@ public class Plateau extends JPanel implements  ComponentListener {
                 x-=dx;
                 y-=dy;
             }
-            if(nba == 4){
+            if(nba == 4){ // gagné!
                 for( Case c : winnings){ // surligne les pions gagnants
                     c.setWinner(true);
                 }
                 return;
             }
         }
-        throw new GagneException();
+        throw new WinException();
     }
 
 
-    public int objectif(int jr){
-        //todo à améliorer
-        //todo tableau d'indice deja pris en compte ( en fait peut etre pas)
-        //+1 si 2 alignés et 1 libre
-        //+10 si 3
-        //100 si 4
-        //- de meme pour l'autre couleur
-        int couleurj = jr;
-        int nba;
-        int nbl;
-        int k;
+    public int objectif(int player){
+        //todo faire 1000 / nombre de colonnes en dessus
+        //+1 * (nombre de colonnes - distance au pion en dessous) si 2 alignés et 2 libres
+        //+1000 *     -                     -             -              si 3 alignés et 1 libre
+        //+infinity si 4 alignés
+        //de meme pour l'autre couleur en négatif
+        int playerColor = player;
+        int nba; // nombre d'aligné rempli
+        int nbl; // nombre d'alignés libres
         int res = 0;
-        int l;
 
         int x;
         int y;
+        int dx;
+        int dy;
         int mult = 0;
-        int couleur = 0;
+        int color = 0;
 
-
-
-        //pour les coup de c et c-1
-        for (int i = 0; i < 7; i ++){
-            int j = 5;
-            while (j >= 0 && !grid[i][j].isFilled()) {
+        //pour savoir si il en a déja 4 alignés
+        for (int i = 0; i < nbCols; i ++){
+            int j = nbRows -1;
+            while (j >= 0 && !grid[i][j].isFilled()) { // descendre jusqu'a trouver un pion
                 j--;
             }
-            if(j>=0 && grid[i][j].getColor() == couleurj) {
+            if(j>=0 && grid[i][j].getColor() == playerColor) {
                 mult = 1;
-                couleur = couleurj;
+                color = playerColor;
             }else if(j>=0){
                 mult = -1;
-                couleur = 1-couleurj;
+                color = 1-playerColor;
             }
             if(j>=0) {
-                for (int ii = 0; ii < 4; ii++) {
-                    x = dirx[ii];
-                    y = diry[ii];
+                for (int k = 0; k < 4; k++) {
+                    dx = dirx[k];
+                    dy = diry[k];
                     nba = 1;
-                    k = i + x;
-                    l = j + y;
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
+                    x = i + dx;
+                    y = j + dy;
+                    while (x >= 0 && x < 7 && y >= 0 && y < 6 && grid[x][y].getColor() == color && nba < 4) {
                         nba++;
-                        k += x;
-                        l += y;
+                        x += dx;
+                        y += dy;
                     }
-                    k = i - x;
-                    l = j - y;
-                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
+                    x = i -dx;
+                    y = j - dy;
+                    while (x >= 0 && x < 7 && y >= 0 && y < 6 && grid[x][y].getColor() == color && nba < 4) {
                         nba++;
-                        k -= x;
-                        l -= y;
+                        x -= dx;
+                        y -= dy;
                     }
                     switch (nba) {
-//                                case 2:
-//                                    res += 1;
-//                                    break;
-//                                case 3:
-//                                    res += 2;
-//                                    break;
                         case 4:
-                            return mult * 100000;
+                            if(mult == -1){
+                                return Integer.MIN_VALUE;
+                            }else{
+                                return Integer.MAX_VALUE;
+                            }
                     }
                 }
             }
 
         }
 
-
-        //pour les prochains coups de c
-        for (int i = 0; i < 7; i ++){
-            int j = 0;
-            while (j < nbRows && grid[i][j].isFilled()) {
-                j++;
+        //pour les prochains coups : cherche 3 alignés et 1 libres ou  2 alignés et 2 libres
+        for (int i = 0; i < nbCols; i ++) {
+            int pionbas = 0;
+            while ( pionbas < nbRows && grid[i][pionbas].isFilled()){
+                pionbas ++;
             }
-            for(int jk =0;jk+j < nbRows; jk++){
-                for(int jj =0; jj < 2; jj++) {
-                    if(jj ==0){
-                        couleur = couleurj;
+            for (int j = nbRows-1; j >= 0 && !grid[i][j].isFilled(); j--) {
+                for (color = 0; color < 2; color++) {
+                    if (color == playerColor) {
                         mult = 1;
-                    }else{
-                        couleur = 1-couleurj;
+                    } else {
                         mult = -1;
                     }
-                    for (int ii = 0; ii < 4; ii++) {
-                        x = dirx[ii];
-                        y = diry[ii];
+                    for (int k = 0; k < 4; k++) {
+                        dx = dirx[k];
+                        dy = diry[k];
                         nba = 0;
-                        nbl = 0;
-                        k = i + x;
-                        l = jk+j + y;
-                        //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-                        if (k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
+                        nbl = 1;
+                        x = i + dx;
+                        y = j + dy;
+                        if(x >= 0 && x < 7 && y >= 0 && y < 6 && !grid[x][y].isFilled()){
                             nbl++;
+                            x = i + dx;
+                            y = j + dy;
                         }
-                        while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
+                        while (x >= 0 && x < 7 && y >= 0 && y < 6 && (grid[x][y].getColor() == color) && nba< 4 ) {
                             nba++;
-                            k += x;
-                            l += y;
+                            x += dx;
+                            y += dy;
                         }
-                        k = i - x;
-                        l = jk+j - y;
-                        //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-                        if (k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
+                        x = i - dx;
+                        y = j - dy;
+                        if(nbl < 2 && x >= 0 && x < 7 && y >= 0 && y < 6 && !grid[x][y].isFilled()){
                             nbl++;
+                            x = i - dx;
+                            y = j - dy;
                         }
-                        while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleur && nba < 4) {
+                        while (x >= 0 && x < 7 && y >= 0 && y < 6 && (grid[x][y].getColor() == color) && nba< 4) {
                             nba++;
-                            k -= x;
-                            l -= y;
+                            x -= dx;
+                            y -= dy;
                         }
 
-                        if (nba == 2 && nbl > 0) {
-                            res += mult*(nbRows+1-jk);
+                        if (nba == 2 && nbl == 2) {
+                            res += mult * (nbRows + 1 - (j-pionbas));
                         } else if (nba >= 3) {
-                            res += mult*(nbRows+1-jk)*10;
+                            res += mult * (nbRows + 1 - (j-pionbas)) * 1000;
                         }
                     }
                 }
 
             }
         }
-
-
-
-//        //pour les prochains coups de c-1
-//        for (int i = 0; i < 7; i ++){
-//            int j = 0;
-//            while (j < nbRows && grid[i][j].isFilled()) {
-//                j++;
-//            }
-//            if(j>=0) {
-//                for(int ii = 0; ii < 4; ii ++){
-//                    x = dirx[ii];
-//                    y = diry[ii];
-//                    nba = 0;
-//                    nbl = 0;
-//                    k = i + x;
-//                    l = j + y;
-//                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-//                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
-//                        nbl++;
-//                    }
-//                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-//                        nba++;
-//                        k += x;
-//                        l += y;
-//                    }
-//                    k = i - x;
-//                    l = j - y;
-//                    //TESTE SI iL Y A UN PION LIBRE DANS L'AUTRE DIRECTION
-//                    if(k >= 0 && k < 7 && l >= 0 && l < 6 && !grid[k][l].isFilled()) {
-//                        nbl++;
-//                    }
-//                    while (k >= 0 && k < 7 && l >= 0 && l < 6 && grid[k][l].getColor() == couleurj && nba < 4) {
-//                        nba++;
-//                        k -= x;
-//                        l -= y;
-//                    }
-//
-//                    if (nba ==  2 && nbl > 0) {
-//                        res -= 1;
-//                    }else if(nba == 3) {
-//                        res -= 10;
-//                    }
-//                }
-//            }
-//        }
     return res;
     }
 
     public void undo(){
+        // défait le coup joué
         if(!undoStack.empty()){
             undoStack.pop().reset();
             nbMoves--;
@@ -383,8 +325,6 @@ public class Plateau extends JPanel implements  ComponentListener {
             draw = false;
         }
     }
-
-    //todo nombre de piont falling si 0 : dt .interrupt
 
     public void componentResized(ComponentEvent e) {
         Case.setRowSize(getSize().height/6);
